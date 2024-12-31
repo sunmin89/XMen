@@ -7,7 +7,7 @@
 
 ## 针对 RISC-V 架构的 “新32位小满OS”
 
-### 新32位工具链(编译器+模拟器+调试器)
+### 新32位工具链(编译器+虚拟机+调试器)
 
 新32位工具链是RuyiSDK的一套面向 RISC-V的开发套件，基于 RISC-V 64ilp32 ABI，融合了松弛扩展寻址技术，让64位硬件流畅运行新32位软件。我们在 qemu 上实现了硬件松弛扩展寻址模式，并用新工具链构建了业内首款新32位Linux内核。与传统32位对比，尽管新32位和传统32位都是32位Linux操作系统软件，但新32位得益于64位指令集，其性能显著优于传统32位。
 
@@ -94,7 +94,7 @@ index 4d43ba9..c2370a3 100644
 参考：https://atomgit.com/easyxmen/XMen/blob/rv64ilp32-dev/Examples/riscv_helloworld/readme.md
 
 ### 效果预览
-![k230d-helloworld](./assets/k230d-helloworld.jpg)
+![k230d-helloworld](./assets/k230d-helloworld.png)
 
 ### CI 流程（针对 CanMV K230）
 为了把 小满OS一键集成到开发板SD卡镜像，可以参考如下CI流程
@@ -102,11 +102,6 @@ index 4d43ba9..c2370a3 100644
 https://github.com/sunmin89/XMen/blob/rv64ilp32-dev/.github/workflows/build.yml
 
 ## 基于RISC-V V扩展特性的适配流程（以Sifive P550为例）
-
-
-
-### 效果预览
-![k230d-helloworld](./assets/p550-helloworld.png)
 
 ## 总结
 
