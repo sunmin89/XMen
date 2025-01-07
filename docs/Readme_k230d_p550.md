@@ -101,7 +101,7 @@ index 4d43ba9..c2370a3 100644
 
 https://github.com/sunmin89/XMen/blob/rv64ilp32-dev/.github/workflows/build.yml
 
-## 基于RISC-V V扩展特性的适配流程（以Sifive P550为例）
+## 基于RISC-V H扩展特性的适配流程（以Sifive P550为例）
 
 ### 在X86环境交叉编译小满OS
 
@@ -121,7 +121,7 @@ index 4d43ba9..6bd0ced 100644
  SECTIONS
  {
 -       . = 0x80400000;
-+       . = 0x6000000;
++       . = 0x60000000;
 
         PROVIDE(_fw_start = .);
 ```
