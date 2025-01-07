@@ -103,13 +103,153 @@ https://github.com/sunmin89/XMen/blob/rv64ilp32-dev/.github/workflows/build.yml
 
 ## 基于RISC-V V扩展特性的适配流程（以Sifive P550为例）
 
+### 在X86环境交叉编译小满OS
+
+- 开发环境及编译方法
+
+参照 https://atomgit.com/easyxmen/XMen/blob/rv64ilp32-dev/Examples/riscv_helloworld/readme.md 
+
+- 指定dram入口地址
+
+```bash
+diff --git a/Examples/riscv_helloworld/Startup/link.ld b/Examples/riscv_helloworld/Startup/link.ld
+index 4d43ba9..6bd0ced 100644
+--- a/Examples/riscv_helloworld/Startup/link.ld
++++ b/Examples/riscv_helloworld/Startup/link.ld
+@@ -3,7 +3,7 @@ ENTRY(_start)
+
+ SECTIONS
+ {
+-       . = 0x80400000;
++       . = 0x6000000;
+
+        PROVIDE(_fw_start = .);
+```
+- 编译
+
+
+### 确保p550硬件本身以及内核开启kvm
+
+``` bash
+$ sudo modprobe kvm
+$ sudo dmesg | tail -n 3
+[  491.361748] kvm [1074]: hypervisor extension available
+[  491.361888] kvm [1074]: using Sv57x4 G-stage page table format
+[  491.361972] kvm [1074]: VMID 14 bits available
+$ file /dev/kvm
+/dev/kvm: character special (10/232)
+```
+
+### 安装依赖(以Debian系OS为例)
+
+```
+$ cat /etc/issue
+Ubuntu 24.04.1 LTS \n \l
+
+$sudo apt update
+
+$ sudo apt install autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev \
+                 gawk build-essential bison flex texinfo gperf libtool patchutils bc \
+                 zlib1g-dev libexpat-dev git ninja-build \
+                 libglib2.0-dev libfdt-dev libpixman-1-dev
+```
+
+`注意`：请确保系统libfdt-dev的版本高于v1.5.1
+
+```bash
+$ dpkg -l libfdt-dev
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name               Version       Architecture Description
++++-==================-=============-============-==========================================================
+ii  libfdt-dev:riscv64 1.7.0-2build1 riscv64      Flat Device Trees manipulation library - development files
+```
+
+### 编译ruyisdk/qemu
+
+- 下载源码
+
+```bash
+$ git clone git@github.com:ruyisdk/qemu.git
+cd qemu
+$ git remote -v
+origin  git@github.com:ruyisdk/qemu.git (fetch)
+origin  git@github.com:ruyisdk/qemu.git (push)
+ubuntu@ubuntu:~/qemu$ git log | head -1
+commit e92975c3911939d8b8f6912908758a04e30322dc
+```
+- 打一个小补丁：指定DRAM入口地址
+
+```bash
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index ab1ce22870..477c07d119 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -94,8 +94,8 @@ static const MemMapEntry virt_memmap[] = {
+     [VIRT_IMSIC_M] =      { 0x24000000, VIRT_IMSIC_MAX_SIZE },
+     [VIRT_IMSIC_S] =      { 0x28000000, VIRT_IMSIC_MAX_SIZE },
+     [VIRT_PCIE_ECAM] =    { 0x30000000,    0x10000000 },
+-    [VIRT_PCIE_MMIO] =    { 0x40000000,    0x40000000 },
+-    [VIRT_DRAM] =         { 0x80000000,           0x0 },
++    [VIRT_PCIE_MMIO] =    { 0x40000000,    0x20000000 },
++    [VIRT_DRAM] =         { 0x60000000,           0x0 },
+ };
+
+ /* PCIe high mmio is fixed for RV32 */
+```
+
+- 配置
+
+```bash
+./configure --target-list=riscv64-softmmu
+```
+- 编译
+
+```bash
+make -j($nproc)
+```
+
+- 验证
+```bash
+$ ./build/qemu-system-riscv64 -version
+QEMU emulator version 8.1.5
+Copyright (c) 2003-2023 Fabrice Bellard and the QEMU Project developers
+ubuntu@ubuntu:~/qemu-ruyisdk$ ./build/qemu-system-riscv64 -accel help
+Accelerators supported in QEMU binary:
+tcg
+kvm
+```
+
+### 启动脚本
+
+``` bash
+$ cat start_kvm.sh
+#!/usr/bin/env bash
+
+sudo modprobe kvm
+
+sudo /home/ubuntu/qemu/build/qemu-system-riscv64 \
+--nographic \
+--enable-kvm \
+-M virt \
+-cpu rv64,sv48=off \
+-m 1024M \
+-smp 1 \
+-kernel /path/to/riscv_helloworld.bin
+```
 ### 效果预览
-![k230d-helloworld](./assets/p550-helloworld.png)
+![p550-helloworld](./assets/p550-helloworld.png)
+
+### 适用于P550的RevyOS镜像链接
 
 ## 总结
 
-## 下一步要做的事情
+小满OS能很容易地移植到支持OpenSBI 或者支持 KVM 虚拟化的硬件平台。
 
 # 参考链接
+
+https://easyxmen.atomgit.com/ 小满OS简介
 https://www.aw-ol.com/news/114 【RISC-V技术动态】新32位产品级开源工具链及Linux内核
-https://ruyisdk.org/docs/intro
+https://ruyisdk.org/docs/intro Hello Ruyi
+https://tinylab.org/stratovirt-riscv-part1/ Stratovirt 的 RISC-V 虚拟化支持（一）：环境配置 
