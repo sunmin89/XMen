@@ -249,7 +249,10 @@ sudo /home/ubuntu/qemu/build/qemu-system-riscv64 \
 
 # 参考链接
 
-https://easyxmen.atomgit.com/ 小满OS简介
-https://www.aw-ol.com/news/114 【RISC-V技术动态】新32位产品级开源工具链及Linux内核
-https://ruyisdk.org/docs/intro Hello Ruyi
-https://tinylab.org/stratovirt-riscv-part1/ Stratovirt 的 RISC-V 虚拟化支持（一）：环境配置 
+- https://easyxmen.atomgit.com/ 小满OS简介
+
+- https://www.aw-ol.com/news/114 【RISC-V技术动态】新32位产品级开源工具链及Linux内核
+
+- https://ruyisdk.org/docs/intro Hello Ruyi
+
+- https://tinylab.org/stratovirt-riscv-part1/ Stratovirt 的 RISC-V 虚拟化支持（一）：环境配置 
