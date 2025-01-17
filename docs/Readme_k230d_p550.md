@@ -101,7 +101,7 @@ index 4d43ba9..c2370a3 100644
 
 https://github.com/sunmin89/XMen/blob/rv64ilp32-dev/.github/workflows/build.yml
 
-## 基于RISC-V H扩展特性的适配流程（以Sifive P550为例）
+## 基于RISC-V V扩展特性的适配流程（以Sifive P550为例）
 
 ### 在X86环境交叉编译小满OS
 
@@ -121,7 +121,7 @@ index 4d43ba9..6bd0ced 100644
  SECTIONS
  {
 -       . = 0x80400000;
-+       . = 0x60000000;
++       . = 0x6000000;
 
         PROVIDE(_fw_start = .);
 ```
@@ -242,6 +242,48 @@ sudo /home/ubuntu/qemu/build/qemu-system-riscv64 \
 ![p550-helloworld](./assets/p550-helloworld.png)
 
 ### 适用于P550的RevyOS镜像链接
+
+## Dhrystone 移植流程及调试演示
+
+Dhrystone 是一个用于CPU的性能测试基准（整型运算+逻辑运算）。为了测试CPU性能（算的快不快和算的准不准），需要设定一个算法。作者定义了一些变量，一些函数，这些变量和函数构成了具体的算法。为了得到可靠的性能指标，首先得保证这些变量的最终值必须和预期一致，然后再去计算耗时。
+
+### 准备源码
+
+```
+git clone https://github.com/iwannatto/dhrystone.git
+```
+
+### 自定义函数
+
+- str相关函数
+- malloc相关函数
+- time相关函数
+
+### 基于 qemu-system-riscv64ilp32 调试演示
+
+- 开启gdb本地调试
+```
+qemu-system-riscv64ilp32 -s -S -cpu rv64 -M virt -m 1G -nographic -bios ~/bins/riscv/qemu-linux/fw_dynamic.bin_m64lp64 -kernel riscv_h    elloworld.bin
+```
+
+- gdb绑定调试端口
+
+```bash
+riscv64-unknown-elf-gdb riscv_helloworld.elf
+#在gdb命令行执行
+target remote localhost:1234
+#添加断点到main函数
+b main.c:main
+#继续执行
+c
+#显示断点
+info b
+```
+- Dhrystone的调试截图
+![gdb-break-bt-print](./assets/gdb-break-bt-print.png)
+
+### 跑分结果
+
 
 ## 总结
 
