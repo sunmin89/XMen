@@ -1,0 +1,4 @@
+Examples/riscv_helloworld/*.o
+Examples/riscv_helloworld/riscv_helloworld.bin
+Examples/riscv_helloworld/riscv_helloworld.asm
+Examples/riscv_helloworld/riscv_helloworld.elf
