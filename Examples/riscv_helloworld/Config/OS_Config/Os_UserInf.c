@@ -18,6 +18,7 @@
 #include "Os.h"
 #include "Arch_Extend.h"
 #include "Arch_Processor.h"
+#include "dhry.h"
 
 /*=======[V E R S I O N   I N F O R M A T I O N]===============================*/
 #define     OS_USERAPP_C_AR_MAJOR_VERSION              19U
@@ -170,6 +171,7 @@ TASK(OsTask_1s)
 {
     /* please insert your code here ... */
     myprintf("Hello, EasyXMen! \n");
+    demo_drystone();
     if (E_OK != TerminateTask())
     {
         while (1)

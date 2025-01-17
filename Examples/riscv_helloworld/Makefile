@@ -5,7 +5,7 @@ LD 	= $(CROSS_COMPILE)ld
 OBJCOPY	= $(CROSS_COMPILE)objcopy
 OBJDUMP	= $(CROSS_COMPILE)objdump
 
-CFLAGS	= -fPIC -fno-stack-protector
+CFLAGS	= -fPIC -fno-stack-protector -DNOSTRUCTASSIGN
 TARGET	= riscv_helloworld
 
 CC_INCLUDE := -I$(CURDIR)/Paltform/Include -I$(CURDIR)/../../RTOS/Kernel/
