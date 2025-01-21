@@ -282,9 +282,17 @@ info b
 - Dhrystone的调试截图
 ![gdb-break-bt-print](./assets/gdb-break-bt-print.png)
 
-### p550 kvm 跑分结果
+### p550 kvm Dhrystone 跑分结果
 
-| kvm 任务个数 | 耗时 |迭代次数|Dhrystone分数(ms/次)|Dhrystone分数(dps:次/s)|
+- 命令
+```
+sudo modprobe kvm
+sudo qemu-system-riscv64 --nographic --enable-kvm -M virt -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+```
+
+- 多核跑分结果
+
+| kvm guest个数 | 耗时 |迭代次数|Dhrystone分数(ms/次)|Dhrystone分数(dps:次/s)|
 | ----------- | ----------- |----------- |----------- |----------- |
 | 1 | 9.6 |20000000|0.48|2083333.333|
 | 2 | 10 |20000000|0.5|2000000|
@@ -296,6 +304,34 @@ info b
 | 8 | 21.2 |20000000|1.062|941619.5857|
 
 ![dhrystone-on-xmen-p550-kvm](./assets/dhrystone-on-xmen-p550-kvm.png)
+
+- 多核跑分时的系统负载情况
+![8-guests-htop](./assets/8-guests-htop.png)
+
+- 单核跑分结果
+首先关闭三个核
+```
+sudo su - root
+echo 0 > /sys/devices/system/cpu/cpu0/online
+echo 0 > /sys/devices/system/cpu/cpu1/online
+echo 0 > /sys/devices/system/cpu/cpu2/online
+```
+
+| kvm guest个数 | 耗时 |迭代次数|Dhrystone分数(ms/次)|Dhrystone分数(dps:次/s)|
+| ----------- | ----------- |----------- |----------- |----------- |
+| 1 | 11.4 |20000000|0.57|2083333.333|
+| 2 | 21.5 |20000000|1.075|930232.5581|
+| 3 | 31.6 |20000000|1.58|632911.3924|
+| 4 | 41.8 |20000000|2.09|478468.8995|
+| 5 | 51.4 |20000000|2.57|389105.0584|
+| 6 | 61.7 |20000000|3.085|324149.1086|
+| 7 | 71.9 |20000000|3.595|278164.1168|
+| 8 | 83.7 |20000000|4.185|238948.626|
+
+![dhrystone-on-xmen-p550-kvm-single](./assets/dhrystone-on-xmen-p550-kvm-single.png)
+
+- 单核跑分时的系统负载情况
+![4-guests-htop-single](./assets/4-guests-htop-single.png)
 
 ## 总结
 
