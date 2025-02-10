@@ -1,4 +1,4 @@
-.PHONY: run clean
+.PHONY: clean
 
 #CROSS=/home/sunmin/bins/riscv/bin/riscv64-unknown-elf-
 CROSS=~/bins/Xuantie-900-gcc-linux-5.10.4-glibc-x86_64-V2.6.1/bin/riscv64-unknown-linux-gnu-
