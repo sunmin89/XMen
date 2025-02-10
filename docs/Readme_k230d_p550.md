@@ -255,9 +255,10 @@ git clone https://github.com/iwannatto/dhrystone.git
 
 ### 自定义函数
 
-- str相关函数
+- strcmp、strcpy相关函数
 - malloc相关函数
 - time相关函数
+
 
 ### 基于 qemu-system-riscv64ilp32 调试演示
 
@@ -289,26 +290,75 @@ info b
 sudo modprobe kvm
 sudo qemu-system-riscv64 --nographic --enable-kvm -M virt -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
 ```
+- Linux （RockOS）底下裸跑
+
+```
+cd Examples/riscv_helloworld/bench/
+make
+#测试
+begin=0
+while [ $begin -le 12 ]
+do
+
+  cid=`expr $begin % 4`
+  echo "####################"
+  echo begin=$begin,cid=$cid
+  echo "####################"
+  time taskset -c $cid ./dry2nr 20000000
+  ((begin++))
+done
+```
+裸跑结果
+
+![dhrystone-p550-linux](./assets/dhrystone-p550-linux.png)
 
 - 多核跑分结果
 
-| kvm guest个数 | 耗时 |迭代次数|Dhrystone分数(ms/次)|Dhrystone分数(dps:次/s)|
-| ----------- | ----------- |----------- |----------- |----------- |
-| 1 | 9.6 |20000000|0.48|2083333.333|
-| 2 | 10 |20000000|0.5|2000000|
-| 3 | 9.9 |20000000|0.495|2020202.02|
-| 4 | 10 |20000000|0.502|1992031.873|
-| 5 | 14.2 |20000000|0.7115|1405481.377|
-| 6 | 17.6 |20000000|0.88|1136363.636|
-| 7 | 19.1 |20000000|0.955|1047120.419|
-| 8 | 21.2 |20000000|1.062|941619.5857|
+1个Guest的跑分命令
+```
+taskset -c 0 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+```
+2个Guest的跑分命令
+```
+taskset -c 0 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 1 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+```
+4个Guest时的跑分命令
+```
+taskset -c 0 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 1 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 2 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 3 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+```
 
-![dhrystone-on-xmen-p550-kvm](./assets/dhrystone-on-xmen-p550-kvm.png)
+5个Guest时的跑分命令
+```
+taskset -c 0 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 0 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 1 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 2 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 3 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+```
 
+8个Guests的跑分命令
+```
+taskset -c 0 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 0 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 1 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 1 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 2 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 2 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 3 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 3 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+```
+
+![dhrystone-on-xmen-p550-kvm-data](./assets/dhrystone-on-xmen-p550-kvm-data.png)
+![dhrystone-on-xmen-p550-kvm-multi](./assets/dhrystone-on-xmen-p550-kvm-multi.png)
 - 多核跑分时的系统负载情况
 ![8-guests-htop](./assets/8-guests-htop.png)
 
 - 单核跑分结果
+
 首先关闭三个核
 ```
 sudo su - root
@@ -316,17 +366,23 @@ echo 0 > /sys/devices/system/cpu/cpu0/online
 echo 0 > /sys/devices/system/cpu/cpu1/online
 echo 0 > /sys/devices/system/cpu/cpu2/online
 ```
+1个Guest的跑分命令
+```
+taskset -c 3 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+```
+2个Guest的跑分命令
+```
+taskset -c 3 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+taskset -c 3 sudo qemu-system-riscv64 --nographic --enable-kvm -M virtilp32 -cpu host -m 1024M -smp 2 -kernel riscv_helloworld.bin
+```
+
 
 | kvm guest个数 | 耗时 |迭代次数|Dhrystone分数(ms/次)|Dhrystone分数(dps:次/s)|
 | ----------- | ----------- |----------- |----------- |----------- |
-| 1 | 11.4 |20000000|0.57|2083333.333|
-| 2 | 21.5 |20000000|1.075|930232.5581|
-| 3 | 31.6 |20000000|1.58|632911.3924|
-| 4 | 41.8 |20000000|2.09|478468.8995|
-| 5 | 51.4 |20000000|2.57|389105.0584|
-| 6 | 61.7 |20000000|3.085|324149.1086|
-| 7 | 71.9 |20000000|3.595|278164.1168|
-| 8 | 83.7 |20000000|4.185|238948.626|
+| 1 | 7.759 |20000000|0.39|2577794|
+| 2 | 15.646 |20000000|0.78|1278795|
+| 3 | 23.622 |20000000|1.18|846660|
+| 4 | 32.396 |20000000|1.62|617360|
 
 ![dhrystone-on-xmen-p550-kvm-single](./assets/dhrystone-on-xmen-p550-kvm-single.png)
 
