@@ -274,7 +274,7 @@
                 /* for strcpy, strcmp */
 
 
-int demo_drystone();
+int demo_dhrystone();
 int strcmp(const char *p,const char *q);
 char* strcpy(char* dest,const char* src);
 

@@ -132,6 +132,7 @@ TASK(OsTask_5ms)
 /*OsTask_10ms: Core0(CPU0),Type = BASIC, Priority = 4*/
 TASK(OsTask_10ms)
 {
+    // demo_dhrystone();
     /* please insert your code here ... */
     myprintf("| Enter task B\n");
     ActivateTask(OsTask_5ms);
@@ -170,8 +171,8 @@ TASK(OsTask_100ms)
 TASK(OsTask_1s)
 {
     /* please insert your code here ... */
-    myprintf("Hello, EasyXMen! \n");
-    demo_drystone();
+    myprintf("Hello, EasyXMen! %d \n",Os_CCB_Inf[Os_SCB.sysCore]->counterCurVal);
+    demo_dhrystone();
     if (E_OK != TerminateTask())
     {
         while (1)
